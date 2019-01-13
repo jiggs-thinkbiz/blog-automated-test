@@ -1,7 +1,10 @@
 class PostsController < ApplicationController
-  skip_before_action :authenticate_user!, only: :show
-  before_action :set_post, only: [:show, :edit]
-  
+  skip_before_action :authenticate_user!, only: [:show, :index]
+  before_action :set_post, only: [:show, :edit, :update, :destroy]
+
+  def index
+  end
+
   def new
     redirect_to new_user_session_path unless user_signed_in?
   end
@@ -23,6 +26,26 @@ class PostsController < ApplicationController
   end
 
   def edit
+  end
+
+  def update
+    respond_to do |format|
+      if @post.update_attributes(post_params)
+        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
+        format.json { render json: @post, status: :updated, location: @post }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    if @post.destroy!
+      redirect_to posts_path
+    else
+      redirect_to @post
+    end
   end
 
   private
