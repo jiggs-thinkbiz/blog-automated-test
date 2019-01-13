@@ -42,12 +42,18 @@ RSpec.describe 'Post page', type: :request do
     #   end
     # end
 
-  context 'Edit post (Unauthorized)' do
+  context 'Edit post' do
     let(:post) { create(:post) }
 
-    it 'Does not load edit page if not authenticated' do
-      get '/posts/edit'
+    it '(Unauthorized) Does not load edit page if not authenticated' do
+      get "/posts/#{post.slug}/edit"
       expect(response).to redirect_to new_user_session_path
+    end
+
+    it '(Authorized) Load edit page' do
+      get '/posts/#{post.slug}/edit'
+      expect(response).to redirect_to edit_post_path(post.slug)
+      expect(response.body).to include('Edit post')
     end
   end
 
