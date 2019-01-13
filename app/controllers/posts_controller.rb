@@ -3,14 +3,20 @@ class PostsController < ApplicationController
   before_action :set_post, only: :show
   
   def new
-    if user_signed_in?
-    else
-      redirect_to new_user_session_path
-    end
+    redirect_to new_user_session_path unless user_signed_in?
   end
 
   def create
-    @post = Post.new(post_params)
+      @post = Post.new(post_params)
+      respond_to do |format|
+      if @post.save
+        format.html { redirect_to @post, notice: 'Post was successfully created.' }
+        format.json { render json: @post, status: :created, location: @post }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def show
@@ -23,6 +29,6 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :body)
+    params.require(:post).permit(:title, :body, :email)
   end
 end
